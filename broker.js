@@ -488,7 +488,13 @@ function Broker()
      * @return mixed
      */
     this.getView = function (view, callback) {
-        return self.getFile("/dashboard/views/"+ view + ".html", callback);
+        return self.getFile("/dashboard/views/"+ view + ".html", function(data)
+                {
+                    /* adding id to views */
+                    data = "<div id='"+view+".html'>"+data+"</div>";
+                    /* user callback */
+                    callback(data);
+                });
     }
 
 

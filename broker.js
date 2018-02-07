@@ -6,6 +6,8 @@
 function Broker()
 {
 
+    /* for calling self methods */
+    var self = this;
 
     /**
      * variable for websiteApiKey
@@ -458,7 +460,7 @@ function Broker()
      * @param callback
      * @return mixed
      */
-    function login(credentials, callback)
+     this.login = function(credentials, callback)
     {
         //console.log(credentials);
         return transport("POST", "login/", credentials, callback);
@@ -472,7 +474,7 @@ function Broker()
      * @param callback
      * @return mixed
      */
-    function getFile(url_path, callback) {
+    this.getFile = function(url_path, callback) {
         var settings = {noApiPath:true};
         return transport("GET", url_path, undefined, callback, settings);
     }
@@ -485,8 +487,8 @@ function Broker()
      * @param callback
      * @return mixed
      */
-    function getView(view, callback) {
-        return getFile("/dashboard/views"+ view + ".html", callback);
+    this.getView = function (view, callback) {
+        return self.getFile("/dashboard/views"+ view + ".html", callback);
     }
 
 

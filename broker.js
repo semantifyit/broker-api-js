@@ -1,6 +1,6 @@
 
 /**
- * Class SemantifyIt
+ * Class Broker
  */
 
 function Broker()

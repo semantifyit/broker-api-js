@@ -318,7 +318,9 @@ function Broker()
         }
 
         if (content == "") {
-            throw new Error('No content received from '  + "" +  url);
+            //throw new Error('No content received from '  + "" +  url);
+            console.log('No content returned from '  + "" + ' action at url '  + "" +  url);
+
         }
 
         return content;
@@ -354,7 +356,8 @@ function Broker()
         }
 
         if (content == "") {
-            throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
+            console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
+            //throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
         }
 
         if (content == "Not Found") {
@@ -423,6 +426,8 @@ function Broker()
                     }
                 },
                 error: function (request, status, error) {
+                    response = request.responseText;
+                    console.log(status, error);
                     if(error){
                         throw new Error('Ajax error: '  +  request.responseText);
                     }

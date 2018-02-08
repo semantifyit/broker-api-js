@@ -317,10 +317,12 @@ function Broker()
                     case (settings.displayErrorMessage !== "undefined"):
                             /* it is already in json */
                             //var output = JSON.stringify(output);
-
+                            console.log(output.message);
                             if(output!==false){
-                                var selector = settings.displayErrorMessage;
-                                selector.html(output.message);
+                               try {
+                                   var selector = settings.displayErrorMessage;
+                                   selector.html(output.message);
+                               }catch(e){}
                             }
                         break;
 

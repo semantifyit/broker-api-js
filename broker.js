@@ -210,7 +210,8 @@ function Broker()
 
         var headers = null;
         var noApiPath = false;
-
+        var output;
+        var e_obj;
 
         /* set aparams to array if they are not initialized */
         if(typeof params === "undefined"){
@@ -225,7 +226,6 @@ function Broker()
             url = staging_server + '/' + api_path  +  '/' +  path;
         }
 
-        //console.log(settings);
         /* check settings  */
         if((typeof settings !== "undefined")){
 
@@ -264,15 +264,16 @@ function Broker()
                         fullurl = url;
                     }
 
-                    return get(fullurl, headers, callback);
+                    output = get(fullurl, headers, callback);
 
                 } catch (/*Error*/ e) {
+
+                    e_obj = e;
 
                     if(error){
                         throw new Error('GET Transport Caught exception: '  +  e.message );
                     }
 
-                    return false;
                 }
                 break;
 
@@ -283,19 +284,21 @@ function Broker()
 
                     /* determine function name automatically by type and call it */
                     if(type=="POST"){
-                        return post( fullurl, params, headers, callback);
+                        output = post( fullurl, params, headers, callback);
                     }
 
                     if(type=="PATCH"){
-                        return patch( fullurl, params, headers, callback);
+                        output = patch( fullurl, params, headers, callback);
                     }
 
                 } catch (/*Error*/ e) {
+
+                    e_obj = e;
+
                     if(error){
                         throw new Error('POST/PATCH Transport Caught exception: '  +  e.message );
                     }
 
-                    return false;
                 }
 
                 break;
@@ -303,6 +306,28 @@ function Broker()
                 debugMe(type);
 
         }
+
+
+        /* check settings  */
+        if((typeof settings !== "undefined")) {
+
+                switch(true){
+
+                        /* if error messages shoudl be dispayed */
+                        case (settings.displayErrorMessage !== "undefined"):
+                            var response = JSON.stringify(output);
+
+                            if(response!==false){
+                                $(settings.displayErrorMessage).html(response.message)
+                            }
+                        break;
+
+                }
+        }
+
+        return output;
+
+
     }
 
     function get(url, headers, callback)
@@ -318,8 +343,8 @@ function Broker()
         }
 
         if (content == "") {
-            //throw new Error('No content received from '  + "" +  url);
-            console.log('No content returned from '  + "" + ' action at url '  + "" +  url);
+            throw new Error('No content received from '  + "" +  url);
+            //console.log('No content returned from '  + "" + ' action at url '  + "" +  url);
 
         }
 
@@ -333,7 +358,7 @@ function Broker()
         var action = "POST";
         var content = curl(action, url, params, headers, callback);
 
-        console.log(content);
+        //console.log(content);
 
         if (content === false) {
             throw new Error('Error posting content to '  + "" +  url);
@@ -466,9 +491,9 @@ function Broker()
      * @param callback
      * @return mixed
      */
-     this.login = function(credentials, callback) {
+     this.login = function(credentials, callback, settings) {
         //console.log(credentials);
-        return transport("POST", "login/", credentials, callback);
+        return transport("POST", "login/", credentials, callback, settings);
      };
 
     /**

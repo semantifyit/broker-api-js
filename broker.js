@@ -320,7 +320,7 @@ function Broker()
 
                             if(output!==false){
                                 var selector = settings.displayErrorMessage;
-                                selector.html(output);
+                                selector.html(output.message);
                             }
                         break;
 

@@ -314,11 +314,12 @@ function Broker()
                 switch(true){
 
                         /* if error messages shoudl be dispayed */
-                    case (settings.displayErrorMessage !== "undefined"):
+                    console.log((typeof settings.displayErrorMessage !== "undefined"));
+                    case (typeof settings.displayErrorMessage !== "undefined"):
                             /* it is already in json */
                             //var output = JSON.stringify(output);
-                            console.log(output.message);
-                            if(output!==false){
+
+                            if(typeof output !== "undefined"){
                                try {
                                    var selector = settings.displayErrorMessage;
                                    selector.html(output.message);

@@ -503,6 +503,21 @@ function Broker()
 
     /**
      *
+     * sending login credentials
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.userCreate = function(user_data, callback, settings) {
+        //console.log(credentials);
+        return transport("POST", "/user/create", user_data, callback, settings);
+    };
+
+
+
+    /**
+     *
      * getting files from server
      *
      * @param url_path

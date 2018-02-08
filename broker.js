@@ -314,12 +314,13 @@ function Broker()
                 switch(true){
 
                         /* if error messages shoudl be dispayed */
-                        case (settings.displayErrorMessage !== "undefined"):
-                            var response = JSON.stringify(output);
-                            console.log(response);
-                            console.log(settings.displayErrorMessage);
-                            if(response!==false){
-                                $(settings.displayErrorMessage).html(response.message)
+                    case (settings.displayErrorMessage !== "undefined"):
+                            /* it is already in json */
+                            //var output = JSON.stringify(output);
+
+                            if(output!==false){
+                                var selector = settings.displayErrorMessage;
+                                selector.html(output);
                             }
                         break;
 
@@ -454,7 +455,7 @@ function Broker()
                     }
                 },
                 error: function (request, status, error) {
-                    response = request.responseText;
+                    response = request.responseJSON;
                     if(request.status==404){
                         throw new Error('Ajax error: '  +  response);
                     }

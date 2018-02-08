@@ -283,11 +283,11 @@ function Broker()
 
                     /* determine function name automatically by type and call it */
                     if(type=="POST"){
-                        post( fullurl, params, headers, callback);
+                        return post( fullurl, params, headers, callback);
                     }
 
                     if(type=="PATCH"){
-                        patch( fullurl, params, headers, callback);
+                        return patch( fullurl, params, headers, callback);
                     }
 
                 } catch (/*Error*/ e) {
@@ -332,6 +332,8 @@ function Broker()
 
         var action = "POST";
         var content = curl(action, url, params, headers, callback);
+
+        console.log(content);
 
         if (content === false) {
             throw new Error('Error posting content to '  + "" +  url);
@@ -402,7 +404,7 @@ function Broker()
 
             jQuery.ajax({
                 url: url,
-                async: true,
+                async: false,
                 type: type,
                 data: params_string,
                 contentType: contentType,
@@ -427,9 +429,8 @@ function Broker()
                 },
                 error: function (request, status, error) {
                     response = request.responseText;
-                    console.log(status, error);
-                    if(error){
-                        throw new Error('Ajax error: '  +  request.responseText);
+                    if(request.status==404){
+                        throw new Error('Ajax error: '  +  response);
                     }
                 }
             });

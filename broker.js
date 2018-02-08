@@ -311,23 +311,24 @@ function Broker()
         /* check settings  */
         if((typeof settings !== "undefined")) {
 
-                switch(true){
+            console.log((typeof settings.displayErrorMessage !== "undefined"));
 
-                        /* if error messages shoudl be dispayed */
-                    console.log((typeof settings.displayErrorMessage !== "undefined"));
-                    case (typeof settings.displayErrorMessage !== "undefined"):
-                            /* it is already in json */
-                            //var output = JSON.stringify(output);
+            switch(true){
 
-                            if(typeof output !== "undefined"){
-                               try {
-                                   var selector = settings.displayErrorMessage;
-                                   selector.html(output.message);
-                               }catch(e){}
-                            }
-                        break;
+                    /* if error messages shoudl be dispayed */
+                case (typeof settings.displayErrorMessage !== "undefined"):
+                        /* it is already in json */
+                        //var output = JSON.stringify(output);
 
-                }
+                        if(typeof output !== "undefined"){
+                           try {
+                               var selector = settings.displayErrorMessage;
+                               selector.html(output.message);
+                           }catch(e){}
+                        }
+                    break;
+
+            }
         }
 
         return output;

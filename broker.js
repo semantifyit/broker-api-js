@@ -311,11 +311,10 @@ function Broker()
         /* check settings  */
         if((typeof settings !== "undefined")) {
 
-            console.log((typeof settings.displayErrorMessage !== "undefined"));
 
             switch(true){
 
-                    /* if error messages shoudl be dispayed */
+                /* if error messages shoudl be dispayed */
                 case (typeof settings.displayErrorMessage !== "undefined"):
                         /* it is already in json */
                         //var output = JSON.stringify(output);

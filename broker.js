@@ -460,11 +460,10 @@ function Broker()
      * @param callback
      * @return mixed
      */
-     this.login = function(credentials, callback)
-    {
+     this.login = function(credentials, callback) {
         //console.log(credentials);
         return transport("POST", "login/", credentials, callback);
-    };
+     };
 
     /**
      *
@@ -488,7 +487,7 @@ function Broker()
      * @return mixed
      */
     this.getView = function (view, callback) {
-        return self.getFile("/dashboard/views/"+ view + ".html", function(data)
+        return self.getFile("dashboard/views/"+ view + ".html", function(data)
                 {
                     /* adding id to views */
                     data = "<div id='"+view+".html'>"+data+"</div>";

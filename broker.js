@@ -316,7 +316,8 @@ function Broker()
                         /* if error messages shoudl be dispayed */
                         case (settings.displayErrorMessage !== "undefined"):
                             var response = JSON.stringify(output);
-
+                            console.log(response);
+                            console.log(settings.displayErrorMessage);
                             if(response!==false){
                                 $(settings.displayErrorMessage).html(response.message)
                             }

@@ -338,8 +338,8 @@ function Broker()
         }
 
         if (content == "") {
-            console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
-            //throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
+            //console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
+            throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
         }
 
         return content;
@@ -356,8 +356,8 @@ function Broker()
         }
 
         if (content == "") {
-            console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
-            //throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
+            //console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
+            throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
         }
 
         if (content == "Not Found") {

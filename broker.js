@@ -511,7 +511,7 @@ function Broker()
      */
     this.userCreate = function(user_data, callback, settings) {
         //console.log(credentials);
-        return transport("POST", "/user/create", user_data, callback, settings);
+        return transport("POST", "user/create", user_data, callback, settings);
     };
 
 

@@ -161,9 +161,6 @@ function Broker()
 
 
 
-
-
-
     function isContentAvailable (input)
     {
         if ((input == "") || (input == false) || (strpos(input, 'error') !== false)) {

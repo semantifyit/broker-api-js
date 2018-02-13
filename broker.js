@@ -316,16 +316,15 @@ function Broker()
 
                 /* if error messages shoudl be dispayed */
                 case (typeof settings.displayErrorMessage !== "undefined"):
-                        /* it is already in json */
-                        //var output = JSON.stringify(output);
-
-                        if(typeof output !== "undefined"){
-                           try {
-                               var selector = settings.displayErrorMessage;
-                               selector.html(output.message);
-                           }catch(e){}
-                        }
+                    /* it is already in json */
+                    if(typeof output !== "undefined" && (output.status!=200)){
+                       try {
+                           var selector = settings.displayErrorMessage;
+                           selector.html(output.response.message);
+                       }catch(e){}
+                    }
                     break;
+
 
             }
         }
@@ -449,16 +448,12 @@ function Broker()
                     }
                 },
                 success: function(data){
-                    response = data;
-                    if(callback!==undefined){
-                        if (typeof callback === "function") {
-                            //console.log(data)
-                            callback(data);
-                        }
-                    }
+                    response = {status: 200, response: data};
+                    callbackHandler(callback, response);
                 },
                 error: function (request, status, error) {
-                    response = request.responseJSON;
+                    response = {status: request.status, response: request.responseJSON};
+                    callbackHandler(callback, response);
                     if(request.status==404){
                         throw new Error('Ajax error: '  +  response);
                     }
@@ -474,6 +469,30 @@ function Broker()
 
     }
 
+
+    /**
+     *
+     * function for handlig callbacks scopes
+     *
+     * @param callback, response
+     */
+    function callbackHandler(callback, response){
+        if(callback!==undefined){
+            try{
+                /* local scope */
+                callback(response);
+            }
+            catch (e) {
+                try{
+                    /* global scope */
+                    window[callback](response);
+                }
+                catch (e) {
+                    console.log(callback + " is not a function!");
+                }
+            }
+        }
+    }
 
 
     /**
@@ -510,7 +529,7 @@ function Broker()
      * @return mixed
      */
     this.userCreate = function(user_data, callback, settings) {
-        //console.log(credentials);
+        console.log(user_data);
         return transport("POST", "user/create", user_data, callback, settings);
     };
 
@@ -541,7 +560,7 @@ function Broker()
         return self.getFile("dashboard/views/"+ view + ".html", function(data)
                 {
                     /* adding id to views */
-                    data = "<div id='"+view+".html'>"+data+"</div>";
+                    data = "<div id='"+view+".html'>"+data.response+"</div>";
                     /* user callback */
                     callback(data);
                 });

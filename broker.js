@@ -562,7 +562,7 @@ function Broker()
                     /* adding id to views */
                     data = "<div id='"+view+".html'>"+data.response+"</div>";
                     /* user callback */
-                    callback(data);
+                    callbackHandler(callback, data);
                 });
     }
 

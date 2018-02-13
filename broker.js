@@ -188,6 +188,37 @@ function Broker()
 
     }
 
+    function resolve(path, obj) {
+        return path.split('.').reduce(function(prev, curr) {
+            return prev ? prev[curr] : null
+        }, obj || self)
+    }
+
+
+    /* this function will replace all object occurences with type @object.b to value of object.b */
+
+    function replaceWithObject(str, obj ){
+        var output = str;
+        const regex = /@(([a-zA-Z]+\.)*([a-zA-Z]+))/gm;
+        let m;
+
+        while ((m = regex.exec(str)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            var original = m[0];
+            var splitme = m[1];
+            var replace =  resolve(splitme, obj);
+
+            output = output.replace(original, replace);
+
+        }
+
+        return output;
+    }
+
 
     function debugMe(text){
         if(debug){
@@ -449,14 +480,15 @@ function Broker()
                 },
                 success: function(data){
                     response = {status: 200, response: data};
-                    callbackHandler(callback, response);
+                    return self.callbackHandler(callback, response);
                 },
                 error: function (request, status, error) {
                     response = {status: request.status, response: request.responseJSON};
-                    callbackHandler(callback, response);
                     if(request.status==404){
                         throw new Error('Ajax error: '  +  response);
                     }
+                    return self.callbackHandler(callback, response);
+
                 }
             });
 
@@ -476,22 +508,25 @@ function Broker()
      *
      * @param callback, response
      */
-    function callbackHandler(callback, response){
-        if(callback!==undefined){
+     this.callbackHandler = function(callback, response){
+         if(callback!==undefined){
             try{
                 /* local scope */
-                callback(response);
+               return callback(response);
             }
             catch (e) {
                 try{
                     /* global scope */
-                    window[callback](response);
+                   return window[callback](response);
                 }
                 catch (e) {
-                    console.log(callback + " is not a function!");
+                    /* if no function than we return what we received */
+                    return response;
                 }
             }
         }
+         /* if no function than we return what we received */
+         return response;
     }
 
 
@@ -557,13 +592,28 @@ function Broker()
      * @return mixed
      */
     this.getView = function (view, callback) {
-        return self.getFile("dashboard/views/"+ view + ".html", function(data)
-                {
-                    /* adding id to views */
-                    data = "<div id='"+view+".html'>"+data.response+"</div>";
-                    /* user callback */
-                    callbackHandler(callback, data);
-                });
+
+       var data = self.getFile("dashboard/views/"+ view + ".html");
+       data = "<div id='"+view+".html'>"+data.response+"</div>";
+       return self.callbackHandler(callback, data);
+
+    }
+
+    /**
+     *
+     * getting dynamic view, which means data will be replaced in view
+     *
+     * @param view
+     * @param callback
+     * @return mixed
+     */
+    this.getDynamicView = function (view, obj, callback) {
+        console.log(obj);
+        var data = self.getView(view);
+            /* user replacement */
+        data = replaceWithObject(data, obj);
+            /* user callback */
+        return self.callbackHandler(callback, data);
     }
 
 

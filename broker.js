@@ -273,6 +273,31 @@ function Broker()
             }
         }
 
+        /* setting callback settings action */
+        var newcallback = function (response) {
+            /* check settings  */
+            if((typeof settings !== "undefined")) {
+
+
+                switch(true){
+
+                    /* if error messages shoudl be dispayed */
+                    case (typeof settings.displayErrorMessage !== "undefined"):
+                        /* it is already in json */
+                        if(typeof response !== "undefined" && (response.status!=200)){
+                            try {
+                                var selector = settings.displayErrorMessage;
+                                selector.html(response.response.message);
+                            }catch(e){}
+                        }
+                        break;
+
+
+                }
+            }
+            self.callbackHandler(callback,response)
+        }
+
 
         switch (type) {
 
@@ -292,7 +317,7 @@ function Broker()
                         fullurl = url;
                     }
 
-                    output = get(fullurl, headers, callback);
+                    get(fullurl, headers, newcallback);
 
                 } catch (/*Error*/ e) {
 
@@ -312,11 +337,11 @@ function Broker()
 
                     /* determine function name automatically by type and call it */
                     if(type=="POST"){
-                        output = post( fullurl, params, headers, callback);
+                        post( fullurl, params, headers, newcallback);
                     }
 
                     if(type=="PATCH"){
-                        output = patch( fullurl, params, headers, callback);
+                        patch( fullurl, params, headers, newcallback);
                     }
 
                 } catch (/*Error*/ e) {
@@ -332,86 +357,12 @@ function Broker()
                 break;
             default:
                 debugMe(type);
-
         }
-
-
-        /* check settings  */
-        if((typeof settings !== "undefined")) {
-
-
-            switch(true){
-
-                /* if error messages shoudl be dispayed */
-                case (typeof settings.displayErrorMessage !== "undefined"):
-                    /* it is already in json */
-                    if(typeof output !== "undefined" && (output.status!=200)){
-                       try {
-                           var selector = settings.displayErrorMessage;
-                           selector.html(output.response.message);
-                       }catch(e){}
-                    }
-                    break;
-
-
-            }
-        }
-
-        return output;
-
-
     }
 
-    function get(url, headers, callback)
-    {
-
-        //if allow url fopen is allowed we will use file_get_contents otherwise curl
-        var content = curl("GET", url, undefined, headers, callback);
-
-        //console.log(content);
-
+    function errorHandler(action, content){
         if (content === false) {
-            throw new Error('Error getting content from '  + "" +  url);
-        }
-
-        if (content == "") {
-            throw new Error('No content received from '  + "" +  url);
-            //console.log('No content returned from '  + "" + ' action at url '  + "" +  url);
-
-        }
-
-        return content;
-
-    }
-
-    function post(url, params, headers, callback)
-    {
-
-        var action = "POST";
-        var content = curl(action, url, params, headers, callback);
-
-        //console.log(content);
-
-        if (content === false) {
-            throw new Error('Error posting content to '  + "" +  url);
-        }
-
-        if (content == "") {
-            //console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
-            throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
-        }
-
-        return content;
-
-    }
-
-    function patch(url, params, headers, callback)
-    {
-        var action = "PATCH";
-        var content = curl(action, url, params, headers, callback);
-
-        if (content === false) {
-            throw new Error('Error patching content to '  + "" +  url);
+            throw new Error('Error '+ action +' content to '  + "" +  url);
         }
 
         if (content == "") {
@@ -422,9 +373,38 @@ function Broker()
         if (content == "Not Found") {
             throw new Error('Annotation Not found for ' + "" + action + "" + ' action at url '  + "" +  url);
         }
+    }
 
-        return content;
 
+    function get(url, headers, callback)
+    {
+        var action = "GET";
+
+        curl(action, url, undefined, headers, function (response) {
+            errorHandler(action, response);
+            self.callbackHandler(callback, response);
+        });
+    }
+
+    function post(url, params, headers, callback)
+    {
+
+        var action = "POST";
+
+        curl(action, url, params, headers, function (response) {
+            errorHandler(action, response);
+            self.callbackHandler(callback, response);
+        });
+    }
+
+    function patch(url, params, headers, callback)
+    {
+        var action = "PATCH";
+
+        curl(action, url, params, headers, function (response) {
+                errorHandler(action, response);
+                self.callbackHandler(callback, response);
+        });
     }
 
 
@@ -461,7 +441,7 @@ function Broker()
 
             jQuery.ajax({
                 url: url,
-                async: false,
+                async: true,
                 type: type,
                 data: params_string,
                 contentType: contentType,
@@ -470,22 +450,20 @@ function Broker()
                         for (var key in headers) {
                             if (headers.hasOwnProperty(key)) {
                                 xhr.setRequestHeader(key, headers[key]);
-
                             }
                         }
                     }
                 },
                 success: function(data){
                     response = {status: 200, response: data};
-                    return self.callbackHandler(callback, response);
+                    self.callbackHandler(callback, response);
                 },
                 error: function (request, status, error) {
                     response = {status: request.status, response: request.responseJSON};
                     if(request.status==404){
                         throw new Error('Ajax error: '  +  response);
                     }
-                    return self.callbackHandler(callback, response);
-
+                    self.callbackHandler(callback, response);
                 }
             });
 
@@ -493,9 +471,6 @@ function Broker()
 
             throw new Error('no jquery! - api will not work');
         }
-
-        return response;
-
     }
 
 
@@ -509,22 +484,48 @@ function Broker()
          if(callback!==undefined){
             try{
                 /* local scope */
-               return callback(response);
+                callback(response);
             }
             catch (e) {
                 try{
                     /* global scope */
-                   return window[callback](response);
+                    window[callback](response);
                 }
                 catch (e) {
                     /* if no function than we return what we received */
-                    return response;
+                    console.log(callback+" is not a function");
                 }
             }
         }
          /* if no function than we return what we received */
-         return response;
     }
+
+    /**
+     *
+     * function for handlig callbacks scopes
+     *
+     * @param callback, response
+     */
+    this.functionHandler = function(func,callback, response){
+        if(callback!==undefined){
+            try{
+                /* local scope */
+                func(response, callback);
+            }
+            catch (e) {
+                try{
+                    /* global scope */
+                    window[func](response, callback);
+                }
+                catch (e) {
+                    /* if no function than we return what we received */
+                    console.log(callback+" is not a function");
+                }
+            }
+        }
+        /* if no function than we return what we received */
+    }
+
 
 
     /**
@@ -548,8 +549,8 @@ function Broker()
      * @return mixed
      */
      this.login = function(credentials, callback, settings) {
-        //console.log(credentials);
-        return transport("POST", "login/", credentials, callback, settings);
+        console.log(credentials);
+         transport("POST", "login/", credentials, callback, settings);
      };
 
     /**
@@ -589,11 +590,10 @@ function Broker()
      * @return mixed
      */
     this.getView = function (view, callback) {
-
-       var data = self.getFile("dashboard/views/"+ view + ".html");
-       data = "<div id='"+view+".html'>"+data.response+"</div>";
-       return self.callbackHandler(callback, data);
-
+        self.getFile("dashboard/views/"+ view + ".html", function(data){
+           data = "<div id='"+view+".html'>"+data.response+"</div>";
+           self.callbackHandler(callback, data);
+       });
     }
 
     /**
@@ -605,12 +605,13 @@ function Broker()
      * @return mixed
      */
     this.getDynamicView = function (view, obj, callback) {
-        console.log(obj);
-        var data = self.getView(view);
-            /* user replacement */
-        data = replaceWithObject(data, obj);
-            /* user callback */
-        return self.callbackHandler(callback, data);
+
+         self.getView(view, function(data){
+             /* user replacement */
+             var newdata = replaceWithObject(data, obj);
+             self.callbackHandler(callback, newdata);
+        });
+
     }
 
 

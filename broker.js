@@ -9,6 +9,7 @@ function Broker()
     /* for calling self methods */
     var self = this;
 
+
     /**
      * variable for websiteApiKey
      *
@@ -580,6 +581,7 @@ function Broker()
         var settings = {noApiPath:true};
         return transport("GET", url_path, undefined, callback, settings);
     }
+
 
     /**
      *

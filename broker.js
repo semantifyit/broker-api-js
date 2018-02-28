@@ -462,7 +462,7 @@ function Broker()
                 error: function (request, status, error) {
                     response = {status: request.status, response: request.responseJSON};
                     if(request.status==404){
-                        throw new Error('Ajax error: '  +  response);
+                        throw new Error('Ajax error: '  +  request.message);
                     }
                     self.callbackHandler(callback, response);
                 }
@@ -550,7 +550,6 @@ function Broker()
      * @return mixed
      */
      this.login = function(credentials, callback, settings) {
-        console.log(credentials);
          transport("POST", "login/", credentials, callback, settings);
      };
 
@@ -563,8 +562,20 @@ function Broker()
      * @return mixed
      */
     this.userCreate = function(user_data, callback, settings) {
-        console.log(user_data);
         return transport("POST", "user/create", user_data, callback, settings);
+    };
+
+    /**
+     *
+     * sending login credentials
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.getUser = function(id, token, callback) {
+        var settings = {headers:{'Authorization': 'Bearer ' + token}};
+        return transport("GET", "user/"+id, undefined, callback, settings);
     };
 
 
@@ -607,14 +618,20 @@ function Broker()
      * @return mixed
      */
     this.getDynamicView = function (view, obj, callback) {
-
          self.getView(view, function(data){
              /* user replacement */
              var newdata = replaceWithObject(data, obj);
              self.callbackHandler(callback, newdata);
         });
-
     }
+
+    this.addWebsite = function(website, callback) {
+       var newdata = {'Website': website}
+       console.log(website,callback);
+        self.callbackHandler(callback, newdata);
+    };
+
+
 
 
 }

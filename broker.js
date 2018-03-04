@@ -604,7 +604,7 @@ function Broker()
      */
     this.getView = function (view, callback) {
         self.getFile("dashboard/views/"+ view + ".html", function(data){
-           data = "<div id='"+view+".html'>"+data.response+"</div>";
+           data = "<div id='"+view+"'>"+data.response+"</div>";
            self.callbackHandler(callback, data);
        });
     }

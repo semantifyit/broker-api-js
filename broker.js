@@ -503,7 +503,8 @@ function Broker() {
                 }
                 catch (e) {
                     /* if no function than we return what we received */
-                    console.log(callback + " is not a function");
+                    console.log(callback + " is not a function "+ e.message);
+                    return false;
                 }
             }
         }
@@ -529,7 +530,8 @@ function Broker() {
                 }
                 catch (e) {
                     /* if no function than we return what we received */
-                    console.log(callback + " is not a function");
+                    console.log(func + " is not a function "+ e.message);
+                    return false;
                 }
             }
         }
@@ -580,12 +582,13 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getUser = function (callback) {
+    this.getUser = function (callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
         var id = self.getUserId();
         var token = self.getToken();
         console.log(token);
         console.log(id);
-        var settings = {headers: {'Authorization': 'Bearer ' + token}};
+        settings.headers = {'Authorization': 'Bearer ' + token};
         return transport("GET", "user/" + id, undefined, callback, settings);
     };
 
@@ -598,8 +601,9 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getFile = function (url_path, callback) {
-        var settings = {noApiPath: true};
+    this.getFile = function (url_path, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+        settings.noApiPath = true;
         return transport("GET", url_path, undefined, callback, settings);
     }
 
@@ -612,11 +616,11 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getView = function (view, callback) {
+    this.getView = function (view, callback, settings) {
         self.getFile("dashboard/views/" + view + ".html", function (data) {
             data = "<div id='" + view + "'>" + data.response + "</div>";
             self.callbackHandler(callback, data);
-        });
+        },settings);
     }
 
     /**
@@ -627,12 +631,12 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getDynamicView = function (view, obj, callback) {
+    this.getDynamicView = function (view, obj, callback, settings) {
         self.getView(view, function (data) {
             /* user replacement */
             var newdata = replaceWithObject(data, obj);
             self.callbackHandler(callback, newdata);
-        });
+        },settings);
     }
 
 
@@ -641,12 +645,15 @@ function Broker() {
      * add website to url
      */
 
-    this.addWebsite = function (website, callback) {
+    this.addWebsite = function (website, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
         var id = self.getUserId();
         var token = self.getToken();
-        var newdata = {'Website': website}
-        console.log(website, callback);
-        self.callbackHandler(callback, newdata);
+
+        var data = {userid: id, url: website.url};
+        settings.headers = {'Authorization': 'Bearer ' + token};
+
+        transport("POST", "website/add", data, callback, settings);
     };
 
 

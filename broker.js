@@ -1,10 +1,8 @@
-
 /**
  * Class Broker
  */
 
-function Broker()
-{
+function Broker() {
 
     /* for calling self methods */
     var self = this;
@@ -24,7 +22,7 @@ function Broker()
      */
 
     var live_server = undefined;
-        
+
     var staging_server = "http://localhost:8810";
 
 
@@ -33,6 +31,10 @@ function Broker()
     var live = false;
 
     var jquery = true;
+
+    var token;
+
+    var userId;
 
     /**
      *
@@ -63,7 +65,7 @@ function Broker()
      * @param string $key
      */
 
-    if(!jQuery) {
+    if (!jQuery) {
         jquery = false;
     }
 
@@ -76,21 +78,32 @@ function Broker()
     /**
      * @return int
      */
-    this.getLive = function ()
-    {
+    this.getLive = function () {
         return live;
     };
 
+    this.getToken = function () {
+        return token;
+    };
+
+    this.getUserId = function () {
+        return userId;
+    };
 
     /**
      * @param int $live
      */
-    this.setLive = function (live2)
-    {
-        live = live2;
+    this.setLive = function (live) {
+        self.live = live;
     };
 
+    this.setToken = function (token) {
+        self.token = token;
+    };
 
+    this.setUserId = function (userId) {
+        self.userId = userId;
+    };
 
 
     /**
@@ -99,8 +112,7 @@ function Broker()
      *
      * @return boolean
      */
-    this.getError = function ()
-    {
+    this.getError = function () {
         return error;
     };
 
@@ -113,8 +125,7 @@ function Broker()
      *
      * @param boolean $error
      */
-    this.setError = function (error2)
-    {
+    this.setError = function (error2) {
         error = error2;
     };
 
@@ -124,10 +135,9 @@ function Broker()
      *
      * @return string
      */
-    this.getWebsiteApiKey = function ()
-    {
+    this.getWebsiteApiKey = function () {
         //return ""
-        if ((error) && ((websiteApiKey=="") || (websiteApiKey=="0"))){
+        if ((error) && ((websiteApiKey == "") || (websiteApiKey == "0"))) {
             throw new Error("Caught problem: no API key saved!");
         }
         return websiteApiKey;
@@ -139,8 +149,7 @@ function Broker()
      *
      * @param string $websiteApiKey
      */
-    this.setWebsiteApiKey = function (websiteApiKey2)
-    {
+    this.setWebsiteApiKey = function (websiteApiKey2) {
         websiteApiKey = websiteApiKey2;
     };
 
@@ -152,7 +161,7 @@ function Broker()
      */
 
 
-    if(typeof key === "undefined"){
+    if (typeof key === "undefined") {
         key = "";
     }
 
@@ -161,9 +170,7 @@ function Broker()
     }
 
 
-
-    function isContentAvailable (input)
-    {
+    function isContentAvailable(input) {
         if ((input == "") || (input == false) || (strpos(input, 'error') !== false)) {
             return false;
         }
@@ -176,18 +183,20 @@ function Broker()
 
         debugMe(params);
 
-        if(jquery){
+        if (jquery) {
             return jQuery.param(params);
-        }else{
+        } else {
             var esc = encodeURIComponent;
-            var query = Object.keys(params).map(k => esc(k) + '=' + esc(params[k])).join('&');
+            var query = Object.keys(params).map(k = > esc(k) + '=' + esc(params[k])
+        ).
+            join('&');
             return query;
         }
 
     }
 
     function resolve(path, obj) {
-        return path.split('.').reduce(function(prev, curr) {
+        return path.split('.').reduce(function (prev, curr) {
             return prev ? prev[curr] : null
         }, obj || self)
     }
@@ -195,7 +204,7 @@ function Broker()
 
     /* this function will replace all object occurences with type @object.b to value of object.b */
 
-    function replaceWithObject(str, obj ){
+    function replaceWithObject(str, obj) {
         var output = str;
         const regex = /@(([a-zA-Z]+\.)*([a-zA-Z]+))/gm;
         let m;
@@ -208,7 +217,7 @@ function Broker()
 
             var original = m[0];
             var splitme = m[1];
-            var replace =  resolve(splitme, obj);
+            var replace = resolve(splitme, obj);
 
             output = output.replace(original, replace);
 
@@ -218,10 +227,10 @@ function Broker()
     }
 
 
-    function debugMe(text){
-        if(debug){
+    function debugMe(text) {
+        if (debug) {
             step++;
-            console.log("step: "+ step + " text: "+ text+" function: "+ arguments.callee.caller.toString());
+            console.log("step: " + step + " text: " + text + " function: " + arguments.callee.caller.toString());
         }
     }
 
@@ -234,8 +243,7 @@ function Broker()
      * @param array $params
      * @return string
      */
-    function transport (type, path, params, callback, settings)
-    {
+    function transport(type, path, params, callback, settings) {
 
         var headers = null;
         var noApiPath = false;
@@ -243,23 +251,23 @@ function Broker()
         var e_obj;
 
         /* set aparams to array if they are not initialized */
-        if(typeof params === "undefined"){
+        if (typeof params === "undefined") {
             params = new Array();
         }
 
         /** url with server and path */
-        var url = live_server  + '/' + api_path + '/'  +  path;
+        var url = live_server + '/' + api_path + '/' + path;
 
         / * if it is in staging server than switch to staging api */
         if (live == false) {
-            url = staging_server + '/' + api_path  +  '/' +  path;
+            url = staging_server + '/' + api_path + '/' + path;
         }
 
         /* check settings  */
-        if((typeof settings !== "undefined")){
+        if ((typeof settings !== "undefined")) {
 
             /* if no api url is needed */
-            if((settings.noApiPath !== "undefined") && (settings.noApiPath)){
+            if ((settings.noApiPath !== "undefined") && (settings.noApiPath)) {
 
                 noApiPath = true;
                 url = live_server + '/' + path;
@@ -269,7 +277,7 @@ function Broker()
 
             }
 
-            if((settings.headers !== "undefined")){
+            if ((settings.headers !== "undefined")) {
                 headers = settings.headers;
             }
         }
@@ -277,26 +285,27 @@ function Broker()
         /* setting callback settings action */
         var newcallback = function (response) {
             /* check settings  */
-            if((typeof settings !== "undefined")) {
+            if ((typeof settings !== "undefined")) {
 
 
-                switch(true){
+                switch (true) {
 
                     /* if error messages shoudl be dispayed */
                     case (typeof settings.displayErrorMessage !== "undefined"):
                         /* it is already in json */
-                        if(typeof response !== "undefined" && (response.status!=200)){
+                        if (typeof response !== "undefined" && (response.status != 200)) {
                             try {
                                 var selector = settings.displayErrorMessage;
                                 selector.html(response.response.message);
-                            }catch(e){}
+                            } catch (e) {
+                            }
                         }
                         break;
 
 
                 }
             }
-            self.callbackHandler(callback,response)
+            self.callbackHandler(callback, response)
         }
 
 
@@ -308,13 +317,13 @@ function Broker()
 
 
                     var query = "";
-                    if(params.length >0){
+                    if (params.length > 0) {
                         query = buildQuery(query);
                     }
 
-                    var fullurl = url +  query;
+                    var fullurl = url + query;
 
-                    if(noApiPath){
+                    if (noApiPath) {
                         fullurl = url;
                     }
 
@@ -324,8 +333,8 @@ function Broker()
 
                     e_obj = e;
 
-                    if(error){
-                        throw new Error('GET Transport Caught exception: '  +  e.message );
+                    if (error) {
+                        throw new Error('GET Transport Caught exception: ' + e.message);
                     }
 
                 }
@@ -337,20 +346,20 @@ function Broker()
                     var fullurl = url;
 
                     /* determine function name automatically by type and call it */
-                    if(type=="POST"){
-                        post( fullurl, params, headers, newcallback);
+                    if (type == "POST") {
+                        post(fullurl, params, headers, newcallback);
                     }
 
-                    if(type=="PATCH"){
-                        patch( fullurl, params, headers, newcallback);
+                    if (type == "PATCH") {
+                        patch(fullurl, params, headers, newcallback);
                     }
 
                 } catch (/*Error*/ e) {
 
                     e_obj = e;
 
-                    if(error){
-                        throw new Error('POST/PATCH Transport Caught exception: '  +  e.message );
+                    if (error) {
+                        throw new Error('POST/PATCH Transport Caught exception: ' + e.message);
                     }
 
                 }
@@ -361,24 +370,23 @@ function Broker()
         }
     }
 
-    function errorHandler(action, content){
+    function errorHandler(action, content) {
         if (content === false) {
-            throw new Error('Error '+ action +' content to '  + "" +  url);
+            throw new Error('Error ' + action + ' content to ' + "" + url);
         }
 
         if (content == "") {
             //console.log('No content returned from ' + " " + action + "" + ' action at url '  + "" +  url);
-            throw new Error('No content returned from ' + "" + action + "" + ' action at url '  + "" +  url);
+            throw new Error('No content returned from ' + "" + action + "" + ' action at url ' + "" + url);
         }
 
         if (content == "Not Found") {
-            throw new Error('Annotation Not found for ' + "" + action + "" + ' action at url '  + "" +  url);
+            throw new Error('Annotation Not found for ' + "" + action + "" + ' action at url ' + "" + url);
         }
     }
 
 
-    function get(url, headers, callback)
-    {
+    function get(url, headers, callback) {
         var action = "GET";
 
         curl(action, url, undefined, headers, function (response) {
@@ -387,8 +395,7 @@ function Broker()
         });
     }
 
-    function post(url, params, headers, callback)
-    {
+    function post(url, params, headers, callback) {
 
         var action = "POST";
 
@@ -398,16 +405,14 @@ function Broker()
         });
     }
 
-    function patch(url, params, headers, callback)
-    {
+    function patch(url, params, headers, callback) {
         var action = "PATCH";
 
         curl(action, url, params, headers, function (response) {
-                errorHandler(action, response);
-                self.callbackHandler(callback, response);
+            errorHandler(action, response);
+            self.callbackHandler(callback, response);
         });
     }
-
 
 
     /**
@@ -420,25 +425,23 @@ function Broker()
      */
 
 
-    function curl (type, url, params, headers, callback)
-    {
+    function curl(type, url, params, headers, callback) {
         var response = "";
         var params_string = null;
 
-        if(typeof params !== "undefined"){
+        if (typeof params !== "undefined") {
             params_string = JSON.stringify(params);
         }
 
         var contentType = null;
-        switch (type){
+        switch (type) {
             case "POST":
                 var contentType = 'application/json ; charset=utf-8';
                 break;
         }
 
 
-
-        if(jquery){
+        if (jquery) {
 
             jQuery.ajax({
                 url: url,
@@ -446,8 +449,8 @@ function Broker()
                 type: type,
                 data: params_string,
                 contentType: contentType,
-                beforeSend: function(xhr) {
-                    if(typeof headers !== "undefined"){
+                beforeSend: function (xhr) {
+                    if (typeof headers !== "undefined") {
                         for (var key in headers) {
                             if (headers.hasOwnProperty(key)) {
                                 xhr.setRequestHeader(key, headers[key]);
@@ -455,20 +458,20 @@ function Broker()
                         }
                     }
                 },
-                success: function(data){
+                success: function (data) {
                     response = {status: 200, response: data};
                     self.callbackHandler(callback, response);
                 },
                 error: function (request, status, error) {
                     response = {status: request.status, response: request.responseJSON};
-                    if(request.status==404){
-                        throw new Error('Ajax error: '  +  request.message);
+                    if (request.status == 404) {
+                        throw new Error('Ajax error: ' + request.message);
                     }
                     self.callbackHandler(callback, response);
                 }
             });
 
-        }else{
+        } else {
 
             throw new Error('no jquery! - api will not work');
         }
@@ -481,24 +484,24 @@ function Broker()
      *
      * @param callback, response
      */
-     this.callbackHandler = function(callback, response){
-         if(callback!==undefined){
-            try{
+    this.callbackHandler = function (callback, response) {
+        if (callback !== undefined) {
+            try {
                 /* local scope */
                 callback(response);
             }
             catch (e) {
-                try{
+                try {
                     /* global scope */
                     window[callback](response);
                 }
                 catch (e) {
                     /* if no function than we return what we received */
-                    console.log(callback+" is not a function");
+                    console.log(callback + " is not a function");
                 }
             }
         }
-         /* if no function than we return what we received */
+        /* if no function than we return what we received */
     }
 
     /**
@@ -507,26 +510,25 @@ function Broker()
      *
      * @param callback, response
      */
-    this.functionHandler = function(func,callback, response){
-        if(callback!==undefined){
-            try{
+    this.functionHandler = function (func, callback, response) {
+        if (callback !== undefined) {
+            try {
                 /* local scope */
                 func(response, callback);
             }
             catch (e) {
-                try{
+                try {
                     /* global scope */
                     window[func](response, callback);
                 }
                 catch (e) {
                     /* if no function than we return what we received */
-                    console.log(callback+" is not a function");
+                    console.log(callback + " is not a function");
                 }
             }
         }
         /* if no function than we return what we received */
     }
-
 
 
     /**
@@ -536,8 +538,7 @@ function Broker()
      * @param $json
      * @return mixed
      */
-    function decoding (json)
-    {
+    function decoding(json) {
         return JSON.parse(json);
     }
 
@@ -549,9 +550,9 @@ function Broker()
      * @param callback
      * @return mixed
      */
-     this.login = function(credentials, callback, settings) {
-         transport("POST", "login/", credentials, callback, settings);
-     };
+    this.login = function (credentials, callback, settings) {
+        transport("POST", "login/", credentials, callback, settings);
+    };
 
     /**
      *
@@ -561,7 +562,7 @@ function Broker()
      * @param callback
      * @return mixed
      */
-    this.userCreate = function(user_data, callback, settings) {
+    this.userCreate = function (user_data, callback, settings) {
         return transport("POST", "user/create", user_data, callback, settings);
     };
 
@@ -573,11 +574,10 @@ function Broker()
      * @param callback
      * @return mixed
      */
-    this.getUser = function(id, token, callback) {
-        var settings = {headers:{'Authorization': 'Bearer ' + token}};
-        return transport("GET", "user/"+id, undefined, callback, settings);
+    this.getUser = function (id, token, callback) {
+        var settings = {headers: {'Authorization': 'Bearer ' + token}};
+        return transport("GET", "user/" + id, undefined, callback, settings);
     };
-
 
 
     /**
@@ -588,8 +588,8 @@ function Broker()
      * @param callback
      * @return mixed
      */
-    this.getFile = function(url_path, callback) {
-        var settings = {noApiPath:true};
+    this.getFile = function (url_path, callback) {
+        var settings = {noApiPath: true};
         return transport("GET", url_path, undefined, callback, settings);
     }
 
@@ -603,10 +603,10 @@ function Broker()
      * @return mixed
      */
     this.getView = function (view, callback) {
-        self.getFile("dashboard/views/"+ view + ".html", function(data){
-           data = "<div id='"+view+"'>"+data.response+"</div>";
-           self.callbackHandler(callback, data);
-       });
+        self.getFile("dashboard/views/" + view + ".html", function (data) {
+            data = "<div id='" + view + "'>" + data.response + "</div>";
+            self.callbackHandler(callback, data);
+        });
     }
 
     /**
@@ -618,20 +618,18 @@ function Broker()
      * @return mixed
      */
     this.getDynamicView = function (view, obj, callback) {
-         self.getView(view, function(data){
-             /* user replacement */
-             var newdata = replaceWithObject(data, obj);
-             self.callbackHandler(callback, newdata);
+        self.getView(view, function (data) {
+            /* user replacement */
+            var newdata = replaceWithObject(data, obj);
+            self.callbackHandler(callback, newdata);
         });
     }
 
-    this.addWebsite = function(website, callback) {
-       var newdata = {'Website': website}
-       console.log(website,callback);
+    this.addWebsite = function (website, userid, token, callback) {
+        var newdata = {'Website': website}
+        console.log(website, callback);
         self.callbackHandler(callback, newdata);
     };
-
-
 
 
 }

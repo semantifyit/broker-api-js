@@ -83,10 +83,18 @@ function Broker() {
     };
 
     this.getToken = function () {
+        if(self.token==""){
+            throw new Error("User token requested but it is not set!");
+            return false;
+        }
         return token;
     };
 
     this.getUserId = function () {
+        if(self.userId==""){
+            throw new Error("User ID requested but it is not set!");
+            return false;
+        }
         return userId;
     };
 
@@ -183,13 +191,11 @@ function Broker() {
 
         debugMe(params);
 
-        if (jquery) {
+        if(jquery){
             return jQuery.param(params);
-        } else {
+        }else{
             var esc = encodeURIComponent;
-            var query = Object.keys(params).map(k = > esc(k) + '=' + esc(params[k])
-        ).
-            join('&');
+            var query = Object.keys(params).map(k => esc(k) + '=' + esc(params[k])).join('&');
             return query;
         }
 
@@ -574,7 +580,9 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getUser = function (id, token, callback) {
+    this.getUser = function (callback) {
+        var id = self.getUserId();
+        var token = self.getToken();
         var settings = {headers: {'Authorization': 'Bearer ' + token}};
         return transport("GET", "user/" + id, undefined, callback, settings);
     };
@@ -625,7 +633,15 @@ function Broker() {
         });
     }
 
-    this.addWebsite = function (website, userid, token, callback) {
+
+    /**
+     *
+     * add website to url
+     */
+
+    this.addWebsite = function (website, callback) {
+        var id = self.getUserId();
+        var token = self.getToken();
         var newdata = {'Website': website}
         console.log(website, callback);
         self.callbackHandler(callback, newdata);

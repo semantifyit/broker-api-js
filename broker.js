@@ -83,19 +83,19 @@ function Broker() {
     };
 
     this.getToken = function () {
-        if(self.token==""){
+        if(typeof self.token === "undefined"){
             throw new Error("User token requested but it is not set!");
             return false;
         }
-        return token;
+        return self.token;
     };
 
     this.getUserId = function () {
-        if(self.userId==""){
+        if(typeof self.userId === "undefined"){
             throw new Error("User ID requested but it is not set!");
             return false;
         }
-        return userId;
+        return self.userId;
     };
 
     /**
@@ -583,6 +583,8 @@ function Broker() {
     this.getUser = function (callback) {
         var id = self.getUserId();
         var token = self.getToken();
+        console.log(token);
+        console.log(id);
         var settings = {headers: {'Authorization': 'Bearer ' + token}};
         return transport("GET", "user/" + id, undefined, callback, settings);
     };

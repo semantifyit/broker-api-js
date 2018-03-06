@@ -471,7 +471,7 @@ function Broker() {
                 error: function (request, status, error) {
                     response = {status: request.status, response: request.responseJSON};
                     if (request.status == 404) {
-                        throw new Error('Ajax error: ' + request.message);
+                        throw new Error('Ajax error: ' + request.responseText);
                     }
                     self.callbackHandler(callback, response);
                 }
@@ -483,6 +483,17 @@ function Broker() {
         }
     }
 
+    /**
+     *
+     * function for decoding, it can be easily turned of if necessary
+     *
+     * @param $json
+     * @return mixed
+     */
+    function decoding(json) {
+        return JSON.parse(json);
+    }
+
 
     /**
      *
@@ -491,7 +502,7 @@ function Broker() {
      * @param callback, response
      */
     this.callbackHandler = function (callback, response) {
-        if (callback !== undefined) {
+        if (typeof callback !== "undefined") {
             try {
                 /* local scope */
                 callback(response);
@@ -518,7 +529,7 @@ function Broker() {
      * @param callback, response
      */
     this.functionHandler = function (func, callback, response) {
-        if (callback !== undefined) {
+        if (typeof callback !== "undefined") {
             try {
                 /* local scope */
                 func(response, callback);
@@ -539,16 +550,7 @@ function Broker() {
     }
 
 
-    /**
-     *
-     * function for decoding, it can be easily turned of if necessary
-     *
-     * @param $json
-     * @return mixed
-     */
-    function decoding(json) {
-        return JSON.parse(json);
-    }
+
 
     /**
      *
@@ -582,7 +584,7 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getUser = function (callback, settings) {
+    this.getUser = function (novalue, callback, settings) {
         if(typeof settings === "undefined"){settings = {};}
         var id = self.getUserId();
         var token = self.getToken();
@@ -631,7 +633,8 @@ function Broker() {
      * @param callback
      * @return mixed
      */
-    this.getDynamicView = function (view, obj, callback, settings) {
+    this.getDynamicView = function (view, callback, settings) {
+        var obj = settings.obj;
         self.getView(view, function (data) {
             /* user replacement */
             var newdata = replaceWithObject(data, obj);
@@ -655,6 +658,27 @@ function Broker() {
 
         transport("POST", "website/add", data, callback, settings);
     };
+
+    /**
+     *
+     * getting list of websites based on user id
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.getWebsites = function (novalue,callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+        var id = self.getUserId();
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+        return transport("GET", "website/list/" + id, undefined, callback, settings);
+    };
+
+
+
+
+
 
 
 }

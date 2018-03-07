@@ -7,34 +7,19 @@ function Broker() {
     /* for calling self methods */
     var self = this;
 
+    this.live_server = "https://broker.semantify.it";
 
-    /**
-     * variable for websiteApiKey
-     *
-     * @param string $websiteApiKey ;
-     */
-    var websiteApiKey;
+    this.staging_server = "http://localhost:8810";
 
-    /**
-     * variables for some api settings
-     *
-     * @param string $websiteKey ;
-     */
+    this.api_path = "api";
 
-    var live_server = "https://broker.semantify.it";
+    this.live = true;
 
-    var staging_server = "http://localhost:8810";
+    this.jquery = true;
 
+    this.token = undefined;
 
-    var api_path = "api";
-
-    var live = true;
-
-    var jquery = true;
-
-    var token;
-
-    var userId;
+    this.userId = undefined;
 
     /**
      *
@@ -66,7 +51,7 @@ function Broker() {
      */
 
     if (!jQuery) {
-        jquery = false;
+        this.jquery = false;
     }
 
 
@@ -74,12 +59,8 @@ function Broker() {
      * Setters and getters
      * */
 
-
-    /**
-     * @return int
-     */
     this.getLive = function () {
-        return live;
+        return self.live;
     };
 
     this.getToken = function () {
@@ -138,43 +119,27 @@ function Broker() {
     };
 
 
-    /**
-     * getter for websiteApiKey
-     *
-     * @return string
-     */
-    this.getWebsiteApiKey = function () {
-        //return ""
-        if ((error) && ((websiteApiKey == "") || (websiteApiKey == "0"))) {
-            throw new Error("Caught problem: no API key saved!");
-        }
-        return websiteApiKey;
-    };
 
 
     /**
-     * setter for websiteApiKey
-     *
-     * @param string $websiteApiKey
-     */
-    this.setWebsiteApiKey = function (websiteApiKey2) {
-        websiteApiKey = websiteApiKey2;
-    };
-
-
-    /**
-     * SemantifyIt constructor.
+     * broker constructor.
      *
      * @param string $key
      */
 
 
-    if (typeof key === "undefined") {
-        key = "";
+    /**
+     * switch to stagging server if it is on the development server
+     */
+    var development = new Array("localhost");
+    if(in_array(window.location.hostname,development)) {
+
+        self.setLive(false);
+        self.setError(true);
     }
 
-    if (key != "") {
-        this.setWebsiteApiKey(key);
+    function in_array(value, array) {
+        return array.indexOf(value) > -1;
     }
 
 
@@ -191,7 +156,7 @@ function Broker() {
 
         debugMe(params);
 
-        if(jquery){
+        if(self.jquery){
             return jQuery.param(params);
         }else{
             var esc = encodeURIComponent;
@@ -262,12 +227,14 @@ function Broker() {
         }
 
         /** url with server and path */
-        var url = live_server + '/' + api_path + '/' + path;
+        var url = self.live_server + '/' + self.api_path + '/' + path;
 
         / * if it is in staging server than switch to staging api */
-        if (live == false) {
-            url = staging_server + '/' + api_path + '/' + path;
+        if (self.live === false) {
+            url = self.staging_server + '/' + self.api_path + '/' + path;
         }
+        console.log(self.live_server);
+        console.log(url);
 
         /* check settings  */
         if ((typeof settings !== "undefined")) {
@@ -276,9 +243,9 @@ function Broker() {
             if ((settings.noApiPath !== "undefined") && (settings.noApiPath)) {
 
                 noApiPath = true;
-                url = live_server + '/' + path;
-                if (live == false) {
-                    url = staging_server + '/' + path;
+                url = self.live_server + '/' + path;
+                if (self.live === false) {
+                    url = self.staging_server + '/' + path;
                 }
 
             }
@@ -447,7 +414,7 @@ function Broker() {
         }
 
 
-        if (jquery) {
+        if (self.jquery) {
 
             jQuery.ajax({
                 url: url,

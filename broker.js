@@ -21,14 +21,14 @@ function Broker() {
      * @param string $websiteKey ;
      */
 
-    var live_server = undefined;
+    var live_server = "http://broker.semantify.it:8810";
 
     var staging_server = "http://localhost:8810";
 
 
     var api_path = "api";
 
-    var live = false;
+    var live = true;
 
     var jquery = true;
 

@@ -518,6 +518,12 @@ function Broker() {
 
 
 
+    this.paramCheck = function(value,name){
+        if(typeof value === "undefined"){throw new Error('Parameter '+name+' is required!');}
+    }
+
+
+
 
     /**
      *
@@ -640,6 +646,22 @@ function Broker() {
         var token = self.getToken();
         settings.headers = {'Authorization': 'Bearer ' + token};
         return transport("GET", "website/list/" + id, undefined, callback, settings);
+    };
+
+    /**
+     *
+     * getting list of websites based on user id
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.getWebsiteCrawl = function (websiteId, callback, settings) {
+        //self.paramCheck();
+        if(typeof settings === "undefined"){settings = {};}
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+        return transport("GET", "website/crawl/" + websiteId, undefined, callback, settings);
     };
 
 

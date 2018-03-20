@@ -284,6 +284,7 @@ function Broker() {
 
         switch (type) {
 
+            case "DELETE":
             case "GET":
 
                 try {
@@ -300,7 +301,16 @@ function Broker() {
                         fullurl = url;
                     }
 
-                    get(fullurl, headers, newcallback);
+
+                    if (type == "GET") {
+                        get(fullurl, headers, newcallback);
+
+                    }
+
+                    if (type == "DELETE") {
+                        del(fullurl, headers, newcallback);
+                    }
+
 
                 } catch (/*Error*/ e) {
 
@@ -368,6 +378,16 @@ function Broker() {
         });
     }
 
+    function del(url, headers, callback) {
+        var action = "DELETE";
+
+        curl(action, url, undefined, headers, function (response) {
+            errorHandler(action, response);
+            self.callbackHandler(callback, response);
+        });
+    }
+
+
     function post(url, params, headers, callback) {
 
         var action = "POST";
@@ -408,6 +428,7 @@ function Broker() {
 
         var contentType = null;
         switch (type) {
+            case "POST":
             case "POST":
                 var contentType = 'application/json ; charset=utf-8';
                 break;
@@ -523,6 +544,14 @@ function Broker() {
     }
 
 
+    function isEmpty(obj) {
+        for(var prop in obj) {
+            if(obj.hasOwnProperty(prop))
+                return false;
+        }
+
+        return JSON.stringify(obj) === JSON.stringify({});
+    }
 
 
     /**
@@ -607,10 +636,19 @@ function Broker() {
      * @return mixed
      */
     this.getDynamicView = function (view, callback, settings) {
-        var obj = settings.obj;
+        var obj = {};
+        if(typeof settings.obj === "undefined"){
+            settings.obj = {};
+        }
+
+        obj = settings.obj;
         self.getView(view, function (data) {
             /* user replacement */
-            var newdata = replaceWithObject(data, obj);
+            var newdata = data;
+            if(!isEmpty(obj)){
+                 newdata = replaceWithObject(data, obj);
+            }
+
             self.callbackHandler(callback, newdata);
         },settings);
     }
@@ -631,6 +669,29 @@ function Broker() {
 
         transport("POST", "website/add", data, callback, settings);
     };
+
+
+
+    /**
+     *
+     * remove website by id
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.deleteWebsite = function (websiteId,callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+
+        if($.isPlainObject( websiteId )){
+            websiteId = websiteId.id;
+        }
+
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+        return transport("DELETE", "website/" + websiteId, undefined, callback, settings);
+    };
+
 
     /**
      *

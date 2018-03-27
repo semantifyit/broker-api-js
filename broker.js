@@ -428,7 +428,7 @@ function Broker() {
 
         var contentType = null;
         switch (type) {
-            case "POST":
+            case "PATCH":
             case "POST":
                 var contentType = 'application/json ; charset=utf-8';
                 break;
@@ -726,6 +726,26 @@ function Broker() {
     };
 
 
+
+    /**
+     *
+     * patch website
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.patchWebsite = function (data, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+
+        var websiteId = data._id;
+
+        console.log("patchWebsite",data);
+
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+        return transport("PATCH", "website/" + websiteId, data, callback, settings);
+    };
 
 
 

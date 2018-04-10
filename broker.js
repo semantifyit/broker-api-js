@@ -11,6 +11,11 @@ function Broker() {
 
     this.staging_server = "http://localhost:8810";
 
+    this.live_server_processor = "https://broker.semantify.it:8010";
+
+    this.staging_server_processor = "http://localhost:8010";
+
+
     this.api_path = "api";
 
     this.live = true;
@@ -20,6 +25,8 @@ function Broker() {
     this.token = undefined;
 
     this.userId = undefined;
+
+    this.organisationId = undefined;
 
     /**
      *
@@ -79,6 +86,14 @@ function Broker() {
         return self.userId;
     };
 
+    this.getOrganisationId = function () {
+        if(typeof self.organisationId === "undefined"){
+            throw new Error("Organisation ID requested but it is not set!");
+            return false;
+        }
+        return self.organisationId;
+    };
+
     /**
      * @param int $live
      */
@@ -93,6 +108,12 @@ function Broker() {
     this.setUserId = function (userId) {
         self.userId = userId;
     };
+
+    this.setOrganisationId = function (organisationId) {
+        self.organisationId = organisationId;
+    };
+
+
 
 
     /**
@@ -253,6 +274,17 @@ function Broker() {
             if ((settings.headers !== "undefined")) {
                 headers = settings.headers;
             }
+
+            /* api processor */
+            if ((settings.useProcessorApi !== "undefined") && (settings.useProcessorApi)) {
+
+                url = self.live_server_processor + '/'  + self.api_path + '/' + path;
+                if (self.live === false) {
+                    url = self.staging_server_processor + '/' + self.api_path + '/' + path;
+                }
+
+            }
+
         }
 
         /* setting callback settings action */
@@ -458,6 +490,7 @@ function Broker() {
                 },
                 error: function (request, status, error) {
                     response = {status: request.status, response: request.responseJSON};
+
                     if (request.status == 404) {
                         throw new Error('Ajax error: ' + request.responseText);
                     }
@@ -590,8 +623,8 @@ function Broker() {
         if(typeof settings === "undefined"){settings = {};}
         var id = self.getUserId();
         var token = self.getToken();
-        console.log(token);
-        console.log(id);
+        //console.log(token);
+        //console.log(id);
         settings.headers = {'Authorization': 'Bearer ' + token};
         return transport("GET", "user/" + id, undefined, callback, settings);
     };
@@ -661,10 +694,10 @@ function Broker() {
 
     this.addWebsite = function (website, callback, settings) {
         if(typeof settings === "undefined"){settings = {};}
-        var id = self.getUserId();
+        var orgId = self.getOrganisationId();
         var token = self.getToken();
 
-        var data = {userid: id, url: website.url};
+        var data = {organisation: orgId, url: website.url};
         settings.headers = {'Authorization': 'Bearer ' + token};
 
         transport("POST", "website/add", data, callback, settings);
@@ -703,10 +736,10 @@ function Broker() {
      */
     this.getWebsites = function (novalue,callback, settings) {
         if(typeof settings === "undefined"){settings = {};}
-        var id = self.getUserId();
+        var orgId = self.getOrganisationId();
         var token = self.getToken();
         settings.headers = {'Authorization': 'Bearer ' + token};
-        return transport("GET", "website/list/" + id, undefined, callback, settings);
+        return transport("GET", "website/list/" + orgId, undefined, callback, settings);
     };
 
     /**
@@ -718,7 +751,6 @@ function Broker() {
      * @return mixed
      */
     this.getWebsiteCrawl = function (websiteId, callback, settings) {
-        //self.paramCheck();
         if(typeof settings === "undefined"){settings = {};}
         var token = self.getToken();
         settings.headers = {'Authorization': 'Bearer ' + token};
@@ -748,6 +780,41 @@ function Broker() {
     };
 
 
+
+    /**
+     *
+     * getting processor retrieval
+     *
+     * @param credentials
+     * @param callback
+     * @return mixed
+     */
+    this.getProcessorWebsiteRetrieval = function (websiteId, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+
+        if($.isPlainObject( websiteId )){
+            websiteId = websiteId.id;
+        }
+
+        settings.useProcessorApi = true;
+        return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
+    };
+
+    /**
+     *
+     * set webpage to process
+     */
+
+    this.addWebsiteToProcessorRetrieval = function (websiteId, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+
+        if($.isPlainObject( websiteId )){
+            websiteId = websiteId.id;
+        }
+
+        settings.useProcessorApi = true;
+        transport("POST", "retrieval/website/" + websiteId, undefined, callback, settings);
+    };
 
 
 

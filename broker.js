@@ -11,7 +11,7 @@ function Broker() {
 
     this.staging_server = "http://localhost:8810";
 
-    this.live_server_processor = "https://broker.semantify.it:8010";
+    this.live_server_processor = "https://broker.semantify.it";
 
     this.staging_server_processor = "http://localhost:8010";
 

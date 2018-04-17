@@ -816,6 +816,23 @@ function Broker() {
         transport("POST", "retrieval/website/" + websiteId, undefined, callback, settings);
     };
 
+    /**
+     *
+     * stop webpage crawling
+     */
+
+    this.stopWebsiteFromProcessorRetrieval = function (websiteId, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+
+        if($.isPlainObject( websiteId )){
+            websiteId = websiteId.id;
+        }
+
+        settings.useProcessorApi = true;
+        transport("DELETE", "retrieval/website/" + websiteId, undefined, callback, settings);
+    };
+
+
 
 
 }

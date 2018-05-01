@@ -772,7 +772,7 @@ function Broker() {
 
         var websiteId = data._id;
 
-        console.log("patchWebsite",data);
+        //console.log("patchWebsite",data);
 
         var token = self.getToken();
         settings.headers = {'Authorization': 'Bearer ' + token};
@@ -796,8 +796,12 @@ function Broker() {
             websiteId = websiteId.id;
         }
 
-        settings.useProcessorApi = true;
-        return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+
+        //settings.useProcessorApi = true;
+        //return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
+        return transport("GET", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
     /**
@@ -812,8 +816,12 @@ function Broker() {
             websiteId = websiteId.id;
         }
 
-        settings.useProcessorApi = true;
-        transport("POST", "retrieval/website/" + websiteId, undefined, callback, settings);
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+
+        //settings.useProcessorApi = true;
+        //transport("POST", "retrieval/website/" + websiteId, undefined, callback, settings);
+        transport("POST", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
     /**
@@ -828,8 +836,12 @@ function Broker() {
             websiteId = websiteId.id;
         }
 
-        settings.useProcessorApi = true;
-        transport("DELETE", "retrieval/website/" + websiteId, undefined, callback, settings);
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
+
+        //settings.useProcessorApi = true;
+        //transport("DELETE", "retrieval/website/" + websiteId, undefined, callback, settings);
+        transport("DELETE", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
 

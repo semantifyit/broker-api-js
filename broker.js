@@ -271,6 +271,13 @@ function Broker() {
 
             }
 
+            /* if no api url is needed */
+            if ((settings.noApiServer !== "undefined") && (settings.noApiServer)) {
+
+                noApiPath = true;
+                url = path;
+            }
+
             if ((settings.headers !== "undefined")) {
                 headers = settings.headers;
             }

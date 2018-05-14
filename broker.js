@@ -796,12 +796,12 @@ function Broker() {
             websiteId = websiteId.id;
         }
 
-        //var token = self.getToken();
-        //settings.headers = {'Authorization': 'Bearer ' + token};
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
 
-        settings.useProcessorApi = true;
-        return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
-        //return transport("GET", "website/retrieval/" + websiteId, undefined, callback, settings);
+        //settings.useProcessorApi = true;
+        //return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
+        return transport("GET", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
     /**
@@ -816,12 +816,12 @@ function Broker() {
             websiteId = websiteId.id;
         }
 
-        //var token = self.getToken();
-        //settings.headers = {'Authorization': 'Bearer ' + token};
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
 
-        settings.useProcessorApi = true;
-        transport("POST", "retrieval/website/" + websiteId, undefined, callback, settings);
-        //transport("POST", "website/retrieval/" + websiteId, undefined, callback, settings);
+        //settings.useProcessorApi = true;
+        //transport("POST", "retrieval/website/" + websiteId, undefined, callback, settings);
+        transport("POST", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
     /**
@@ -836,12 +836,12 @@ function Broker() {
             websiteId = websiteId.id;
         }
 
-        //var token = self.getToken();
-        //settings.headers = {'Authorization': 'Bearer ' + token};
+        var token = self.getToken();
+        settings.headers = {'Authorization': 'Bearer ' + token};
 
-        settings.useProcessorApi = true;
-        transport("DELETE", "retrieval/website/" + websiteId, undefined, callback, settings);
-        //transport("DELETE", "website/retrieval/" + websiteId, undefined, callback, settings);
+        //settings.useProcessorApi = true;
+        //transport("DELETE", "retrieval/website/" + websiteId, undefined, callback, settings);
+        transport("DELETE", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
 

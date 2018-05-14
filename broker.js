@@ -7,18 +7,9 @@ function Broker() {
     /* for calling self methods */
     var self = this;
 
-    this.live_server = "https://broker.semantify.it";
-
-    this.staging_server = "http://localhost:8810";
-
-    this.live_server_processor = "https://broker.semantify.it";
-
-    this.staging_server_processor = "http://localhost:8010";
-
+    this.server = window.origin
 
     this.api_path = "api";
-
-    this.live = true;
 
     this.jquery = true;
 
@@ -66,10 +57,6 @@ function Broker() {
      * Setters and getters
      * */
 
-    this.getLive = function () {
-        return self.live;
-    };
-
     this.getToken = function () {
         if(typeof self.token === "undefined"){
             throw new Error("User token requested but it is not set!");
@@ -92,13 +79,6 @@ function Broker() {
             return false;
         }
         return self.organisationId;
-    };
-
-    /**
-     * @param int $live
-     */
-    this.setLive = function (live) {
-        self.live = live;
     };
 
     this.setToken = function (token) {
@@ -155,7 +135,6 @@ function Broker() {
     var development = new Array("localhost");
     if(in_array(window.location.hostname,development)) {
 
-        self.setLive(false);
         self.setError(true);
     }
 
@@ -248,13 +227,9 @@ function Broker() {
         }
 
         /** url with server and path */
-        var url = self.live_server + '/' + self.api_path + '/' + path;
+        var url = self.server + '/' + self.api_path + '/' + path;
 
-        / * if it is in staging server than switch to staging api */
-        if (self.live === false) {
-            url = self.staging_server + '/' + self.api_path + '/' + path;
-        }
-        console.log(self.live_server);
+        console.log(self.server);
         console.log(url);
 
         /* check settings  */
@@ -264,10 +239,7 @@ function Broker() {
             if ((settings.noApiPath !== "undefined") && (settings.noApiPath)) {
 
                 noApiPath = true;
-                url = self.live_server + '/' + path;
-                if (self.live === false) {
-                    url = self.staging_server + '/' + path;
-                }
+                url = self.server + '/' + path;
 
             }
 
@@ -285,10 +257,7 @@ function Broker() {
             /* api processor */
             if ((settings.useProcessorApi !== "undefined") && (settings.useProcessorApi)) {
 
-                url = self.live_server_processor + '/'  + self.api_path + '/' + path;
-                if (self.live === false) {
-                    url = self.staging_server_processor + '/' + self.api_path + '/' + path;
-                }
+                url = self.server + '/'  + self.api_path + '/' + path;
 
             }
 
@@ -855,25 +824,3 @@ function Broker() {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,7 +7,7 @@ function Broker() {
     /* for calling self methods */
     var self = this;
 
-    this.server = window.origin
+    this.server = window.origin;
 
     this.api_path = "api";
 

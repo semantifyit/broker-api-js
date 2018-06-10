@@ -4,7 +4,7 @@
 
 function Broker() {
 
-    /* for calling self methods */
+    /** for calling self methods */
     var self = this;
 
     this.server = window.origin;

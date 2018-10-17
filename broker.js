@@ -875,6 +875,9 @@ function Broker() {
             ' "result": {' +
             '   "@type": "'+ type +'"' +
             ' },' +
+            '   "object": {'+
+            '       "limit": "100000"'+
+            '   },'+
             ' "name": "Results for: '+ type +'"' +
             '}';
         json = JSON.parse(json);

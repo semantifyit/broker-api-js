@@ -19,6 +19,8 @@ function Broker() {
 
     this.organisationId = undefined;
 
+    this.organisationUid = undefined;
+
     /**
      *
      * var for displaying errors or not
@@ -81,6 +83,14 @@ function Broker() {
         return self.organisationId;
     };
 
+    this.getOrganisationUid = function () {
+        if(typeof self.organisationUid === "undefined"){
+            throw new Error("Organisation ID requested but it is not set!");
+            return false;
+        }
+        return self.organisationUid;
+    };
+
     this.setToken = function (token) {
         self.token = token;
     };
@@ -93,7 +103,9 @@ function Broker() {
         self.organisationId = organisationId;
     };
 
-
+    this.setOrganisationUid = function (organisationUid) {
+        self.organisationUid = organisationUid;
+    };
 
 
     /**
@@ -229,6 +241,8 @@ function Broker() {
         /** url with server and path */
         var url = self.server + '/' + self.api_path + '/' + path;
 
+
+
         console.log(self.server);
         console.log(url);
 
@@ -311,12 +325,12 @@ function Broker() {
 
 
                     if (type == "GET") {
-                        get(fullurl, headers, newcallback);
+                        get(fullurl, headers, newcallback, settings);
 
                     }
 
                     if (type == "DELETE") {
-                        del(fullurl, headers, newcallback);
+                        del(fullurl, headers, newcallback, settings);
                     }
 
 
@@ -338,11 +352,11 @@ function Broker() {
 
                     /* determine function name automatically by type and call it */
                     if (type == "POST") {
-                        post(fullurl, params, headers, newcallback);
+                        post(fullurl, params, headers, newcallback, settings);
                     }
 
                     if (type == "PATCH") {
-                        patch(fullurl, params, headers, newcallback);
+                        patch(fullurl, params, headers, newcallback, settings);
                     }
 
                 } catch (/*Error*/ e) {
@@ -377,42 +391,42 @@ function Broker() {
     }
 
 
-    function get(url, headers, callback) {
+    function get(url, headers, callback, settings) {
         var action = "GET";
 
         curl(action, url, undefined, headers, function (response) {
             errorHandler(action, response);
             self.callbackHandler(callback, response);
-        });
+        }, settings);
     }
 
-    function del(url, headers, callback) {
+    function del(url, headers, callback, settings) {
         var action = "DELETE";
 
         curl(action, url, undefined, headers, function (response) {
             errorHandler(action, response);
             self.callbackHandler(callback, response);
-        });
+        }, settings);
     }
 
 
-    function post(url, params, headers, callback) {
+    function post(url, params, headers, callback, settings) {
 
         var action = "POST";
 
         curl(action, url, params, headers, function (response) {
             errorHandler(action, response);
             self.callbackHandler(callback, response);
-        });
+        }, settings);
     }
 
-    function patch(url, params, headers, callback) {
+    function patch(url, params, headers, callback, settings) {
         var action = "PATCH";
 
         curl(action, url, params, headers, function (response) {
             errorHandler(action, response);
             self.callbackHandler(callback, response);
-        });
+        }, settings);
     }
 
 
@@ -426,9 +440,10 @@ function Broker() {
      */
 
 
-    function curl(type, url, params, headers, callback) {
+    function curl(type, url, params, headers, callback, settings) {
         var response = "";
         var params_string = null;
+        var timeout = 2000;
 
         if (typeof params !== "undefined") {
             params_string = JSON.stringify(params);
@@ -442,6 +457,11 @@ function Broker() {
                 break;
         }
 
+        if(typeof settings !== "undefined") {
+            if ((settings.timeout !== "undefined")) {
+                timeout = settings.timeout;
+            }
+        }
 
         if (self.jquery) {
 
@@ -450,6 +470,7 @@ function Broker() {
                 async: true,
                 type: type,
                 data: params_string,
+                timeout: timeout,
                 contentType: contentType,
                 beforeSend: function (xhr) {
                     if (typeof headers !== "undefined") {
@@ -819,6 +840,48 @@ function Broker() {
         //transport("DELETE", "retrieval/website/" + websiteId, undefined, callback, settings);
         transport("DELETE", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
+
+    /**
+     *
+     * download searchAction
+     */
+
+    this.searchAction = function (searchAction, callback, settings) {
+        if(typeof settings === "undefined"){settings = {};}
+        settings.timeout = 0;
+        //settings.noApiServer = true;
+        //transport("POST", "https://broker.semantify.it/api/publish/search", searchAction, callback, settings);
+        transport("POST", "publish/search/", searchAction, callback, settings);
+    };
+
+
+
+    /**
+     *
+     * prepare search action json
+     */
+
+    this.prepareSearchActionJson = function(type, websiteId){
+
+        var organisation = self.getOrganisationUid();
+
+        var json = '{' +
+            ' "@type": "SearchAction",' +
+            ' "agent": {' +
+            '   "@type": "Organization",' +
+            '   "name": "'+ organisation +'",' +
+            '    "alternateName": "'+ websiteId +'"' +
+            ' },' +
+            ' "result": {' +
+            '   "@type": "'+ type +'"' +
+            ' },' +
+            ' "name": "Results for: '+ type +'"' +
+            '}';
+        json = JSON.parse(json);
+        return json;
+    }
+
+
 
 
 

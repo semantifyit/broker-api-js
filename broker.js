@@ -876,7 +876,8 @@ function Broker() {
             '   "@type": "'+ type +'"' +
             ' },' +
             '   "object": {'+
-            '       "limit": "100000"'+
+            '       "limit": "100000",'+
+            '       "offset": "0"'+
             '   },'+
             ' "name": "Results for: '+ type +'"' +
             '}';

@@ -796,9 +796,9 @@ function Broker() {
         var token = self.getToken();
         settings.headers = {'Authorization': 'Bearer ' + token};
 
-        //settings.useProcessorApi = true;
-        //return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
-        return transport("GET", "website/retrieval/" + websiteId, undefined, callback, settings);
+        settings.useProcessorApi = true;
+        return transport("GET", "retrieval/website/" + websiteId, undefined, callback, settings);
+        //return transport("GET", "website/retrieval/" + websiteId, undefined, callback, settings);
     };
 
     /**
@@ -849,9 +849,9 @@ function Broker() {
     this.searchAction = function (searchAction, callback, settings) {
         if(typeof settings === "undefined"){settings = {};}
         settings.timeout = 0;
-        //settings.noApiServer = true;
-        //transport("POST", "https://broker.semantify.it/api/publish/search", searchAction, callback, settings);
-        transport("POST", "publish/search/", searchAction, callback, settings);
+        settings.noApiServer = true;
+        transport("POST", "https://broker.semantify.it/api/publish/search", searchAction, callback, settings);
+        //transport("POST", "publish/search/", searchAction, callback, settings);
     };
 
 
@@ -861,7 +861,7 @@ function Broker() {
      * prepare search action json
      */
 
-    this.prepareSearchActionJson = function(type, websiteId){
+    this.prepareSearchActionJson = function(type, websiteId, limit, offset){
 
         var organisation = self.getOrganisationUid();
 
@@ -876,8 +876,8 @@ function Broker() {
             '   "@type": "'+ type +'"' +
             ' },' +
             '   "object": {'+
-            '       "limit": "100000",'+
-            '       "offset": "0"'+
+            '       "limit": "'+limit+'",'+
+            '       "offset": "'+offset+'"'+
             '   },'+
             ' "name": "Results for: '+ type +'"' +
             '}';

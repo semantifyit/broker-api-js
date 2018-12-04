@@ -243,8 +243,8 @@ function Broker() {
 
 
 
-        console.log(self.server);
-        console.log(url);
+        //console.log(self.server);
+        //console.log(url);
 
         /* check settings  */
         if ((typeof settings !== "undefined")) {
